@@ -1,5 +1,5 @@
 <?php
-include ('../conn/conn.php');
+include ('../config/conn.php');
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
@@ -17,7 +17,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo "
             <script>
                 alert('Login Successfully!');
-                window.location.href = '../home.php';
+                window.location.href = '../model/header.php';
             </script>
             "; 
         } else {

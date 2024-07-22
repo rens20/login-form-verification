@@ -1,0 +1,46 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-image: url("../assets/bg.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    height: 100vh;
+}
+
+.verification-form {
+    backdrop-filter: blur(100px);
+    color: rgb(255, 255, 255);
+    padding: 40px;
+    width: 500px;
+    border: 2px solid;
+    border-radius: 10px;
+    /* Add a max-width to ensure it doesn’t grow too large on larger screens */
+    max-width: 90%;
+    /* Center the form horizontally */
+    margin: 0 auto;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .verification-form {
+        width: 90%;
+        padding: 30px;
+    }
+}
+
+@media (max-width: 480px) {
+    .verification-form {
+        width: 95%;
+        padding: 20px;
+    }
+}

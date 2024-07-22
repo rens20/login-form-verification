@@ -1,4 +1,4 @@
-<?php include ('./conn/conn.php') ?>
+<?php include ('./config/conn.php') ?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -6,57 +6,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login System with Email Verification</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
-
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap');
-
-        * {
-            margin: 0;
-            padding: 0;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-           background-color: black;
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            height: 100vh;
-        }
-
-        .login-form, .registration-form {
-            backdrop-filter: blur(100px);
-            color: rgb(255, 255, 255);
-            padding: 40px;
-            width: 500px;
-            border: 2px solid;
-            border-radius: 10px;
-        }
-        .switch-form-link {
-            text-decoration: underline;
-            cursor: pointer;
-            color: rgb(100, 100, 200);
-        }
-    </style>
+ <link rel="stylesheet" href="./css/login-form.css">
 </head>
-<body>
+<body class="">
     
     <div class="main">
 
         <!-- Login Area -->
-
         <div class="login-container">
-
             <div class="login-form" id="loginForm">
                 <h2 class="text-center">Welcome Back!</h2>
                 <p class="text-center">Fill your login details.</p>
-                <form action="./endpoint/login.php" method="POST">
+                <form action="./controller/login.php" method="POST">
                     <div class="form-group">
                         <label for="username">Username:</label>
                         <input type="text" class="form-control" id="username" name="username">
@@ -66,7 +31,7 @@
                         <input type="password" class="form-control" id="password" name="password">
                     </div>
                     <p>No Account? Register <span  class="switch-form-link" onclick="showRegistrationForm()">Here.</span></p>
-                    <button type="submit" class="btn btn-secondary login-btn form-control" >Login</button>
+                    <button type="submit" class="btn btn-dark login-btn form-control" >Login</button>
                 </form>
             </div>
 
@@ -78,7 +43,7 @@
         <div class="registration-form" id="registrationForm">
             <h2 class="text-center">Registration Form</h2>
             <p class="text-center">Fill in you personal details.</p>
-            <form action="./endpoint/add-user.php" method="POST">
+            <form action="./controller/add-user.php" method="POST">
                 <div class="form-group registration row">
                     <div class="col-6">
                         <label for="firstName">First Name:</label>
@@ -109,44 +74,10 @@
                 </div>
                 <p>Already have an account? Login <span class="switch-form-link" onclick="showLoginForm()">Here.</span></p>
                 <button type="submit" class="btn btn-dark login-register form-control" name="register">Register</button>
-
             </form>
-
         </div>
-
     </div>
-
-    <script>
-        const loginForm = document.getElementById('loginForm');
-        const registrationForm = document.getElementById('registrationForm');
-
-        registrationForm.style.display = "none";
-
-
-        function showRegistrationForm() {
-            registrationForm.style.display = "";
-            loginForm.style.display = "none";
-        }
-
-        function showLoginForm() {
-            registrationForm.style.display = "none";
-            loginForm.style.display = "";
-        }
-
-        function sendVerificationCode() {
-            const registrationElements = document.querySelectorAll('.registration');
-
-            registrationElements.forEach(element => {
-                element.style.display = 'none';
-            });
-
-            const verification = document.querySelector('.verification');
-            if (verification) {
-                verification.style.display = 'none';
-            }
-        }
-
-    </script>
+<script src="./javascript/login-form.js"></script>
 
     <!-- Bootstrap Js -->
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
