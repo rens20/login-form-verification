@@ -1,4 +1,4 @@
-<?php include ('./conn/conn.php') ?>
+<?php include ('../config/conn.php') ?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -23,7 +23,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-           background-color: black;
+            background-color: black;
             background-size: cover;
             background-repeat: no-repeat;
             background-attachment: fixed;
@@ -72,7 +72,7 @@
                 <div class="modal-header">
                     <h5 class="modal-title" id="updateUserModal">Update User</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
+                        <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
@@ -113,32 +113,27 @@
         </div>
     </div>
 
-
     <div class="content">
         <h4>List of users</h4>
         <hr>
         <table class="table table-hover table-collapse">
             <thead>
                 <tr>
-                <th scope="col">User ID</th>
-                <th scope="col">First Name</th>
-                <th scope="col">Last Name</th>
-                <th scope="col">Contact Number</th>
-                <th scope="col">Email</th>
-                <th scope="col">Username</th>
-                <th scope="col">Password</th>
-                <th scope="col">Action</th>
+                    <th scope="col">User ID</th>
+                    <th scope="col">First Name</th>
+                    <th scope="col">Last Name</th>
+                    <th scope="col">Contact Number</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Username</th>
+                    <th scope="col">Password</th>
+                    <th scope="col">Action</th>
                 </tr>
             </thead>
             <tbody>
-
                 <?php 
-                
                     $stmt = $conn->prepare("SELECT * FROM `tbl_user`");
                     $stmt->execute();
-
                     $result = $stmt->fetchAll();
-
                     foreach ($result as $row) {
                         $userID = $row['tbl_user_id'];
                         $firstName = $row['first_name'];
@@ -147,9 +142,7 @@
                         $email = $row['email'];
                         $username = $row['username'];
                         $password = $row['password'];
-
-                    ?>
-
+                ?>
                     <tr>
                         <td id="userID-<?= $userID ?>"><?php echo $userID ?></td>
                         <td id="firstName-<?= $userID ?>"><?php echo $firstName ?></td>
@@ -163,10 +156,8 @@
                             <button id="deleteBtn" onclick="delete_user(<?php echo $userID ?>)">&#128465;</button>
                         </td>
                     </tr>    
-
-                    <?php
+                <?php
                     }
-
                 ?>
             </tbody>
         </table>
@@ -176,7 +167,6 @@
         // Update user
         function update_user(id) {
             $("#updateUserModal").modal("show");
-
             let updateUserID = $("#userID-" + id).text();
             let updateFirstName = $("#firstName-" + id).text();
             let updateLastName = $("#lastName-" + id).text();
@@ -184,10 +174,7 @@
             let updateEmail = $("#email-" + id).text();
             let updateUsername = $("#username-" + id).text();
             let updatePassword = $("#password-" + id).text();
-
-            console.log(updateFirstName);
-            console.log(updateLastName);
-
+            
             $("#updateUserID").val(updateUserID);
             $("#updateFirstName").val(updateFirstName);
             $("#updateLastName").val(updateLastName);
@@ -195,7 +182,6 @@
             $("#updateEmail").val(updateEmail);
             $("#updateUsername").val(updateUsername);
             $("#updatePassword").val(updatePassword);
-
         }
 
         // Delete user
@@ -204,14 +190,11 @@
                 window.location = "./endpoint/delete-user.php?user=" + id;
             }
         }
-
-
     </script>
 
     <!-- Bootstrap Js -->
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js"></script>
-
 </body>
 </html>

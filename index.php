@@ -44,11 +44,14 @@
             <h2 class="text-center">Registration Form</h2>
             <p class="text-center">Fill in you personal details.</p>
             <form action="./controller/add-user.php" method="POST">
+                
                 <div class="form-group registration row">
+                    
                     <div class="col-6">
                         <label for="firstName">First Name:</label>
                         <input type="text" class="form-control" id="firstName" name="first_name">
                     </div>
+                    
                     <div class="col-6">
                         <label for="lastName">Last Name:</label>
                         <input type="text" class="form-control" id="lastName" name="last_name">

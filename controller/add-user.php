@@ -14,6 +14,8 @@ require 'PHPMailer/src/SMTP.php';
 
 $mail = new PHPMailer(true);
 
+
+
 if (isset($_POST['register'])) {
     try {
         session_start();
@@ -55,6 +57,7 @@ if (isset($_POST['register'])) {
             $mail->Password   = 'qipc vais smfq rwim';
             $mail->SMTPSecure = 'ssl';
             $mail->Port       = 465;
+            // 'qipc vais smfq rwim';
 
             //Recipients
             $mail->setFrom('wasiacuna@gmail.com', 'Verification OTP (SYSTEM)');
