@@ -3,11 +3,14 @@ session_start();
 include('../config/conn.php');
 include('../model/header.php');
 include('../model/sidebar.php');
-// Fetch posts with like and view counts
+
+// Fetch posts with like and view counts, including user data
 $sql = "
     SELECT p.id, p.title, p.text, p.image, p.tbl_user_id, 
            COALESCE(likeCounts.likeCount, 0) as like_count,
-           COALESCE(viewCounts.viewCount, 0) as views
+           COALESCE(viewCounts.viewCount, 0) as views,
+           p.created_at,
+           u.username, u.profile_image
     FROM posts p
     LEFT JOIN (
         SELECT post_id, COUNT(*) as likeCount 
@@ -19,6 +22,9 @@ $sql = "
         FROM post_views
         GROUP BY post_id
     ) viewCounts ON p.id = viewCounts.post_id
+    LEFT JOIN tbl_user u ON p.tbl_user_id = u.tbl_user_id
+    WHERE p.created_at > DATE_SUB(NOW(), INTERVAL 1 DAY)
+    ORDER BY p.created_at DESC, views DESC, like_count DESC
 ";
 $stmt = $conn->prepare($sql);
 $stmt->execute();
@@ -39,6 +45,19 @@ $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
     .view-btn {
         transition: transform 0.2s ease;
     }
+
+    .profile-image {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        margin-right: 8px;
+    }
+
+    .user-info {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+    }
 </style>
 
 <div class="container mx-auto p-6 bg-white shadow-md rounded-lg max-w-3xl">
@@ -46,6 +65,17 @@ $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <?php foreach ($posts as $post): ?>
         <div class="mb-6 p-4 border border-gray-300 rounded-md shadow-sm post" data-post-id="<?php echo $post['id']; ?>">
+            <div class="user-info">
+                <?php
+                // Check if user has a profile image in the database
+                $profileImage = !empty($post['profile_image']) ? '../uploads/' . htmlspecialchars($post['profile_image']) : '../uploads/default.png';
+                ?>
+                <img src='<?php echo htmlspecialchars($profileImage); ?>' alt='Profile Picture' class='profile-image'>
+                <a href="user-profile.php?user_id=<?php echo urlencode($post['tbl_user_id']); ?>" class="font-semibold ml-2 text-2xl">
+    <?php echo htmlspecialchars($post['username']); ?>
+</a>
+
+            </div>
             <h2 class="text-xl font-semibold mb-2"><?php echo htmlspecialchars($post['title']); ?></h2>
             <p class="text-gray-700 mb-2"><?php echo nl2br(htmlspecialchars($post['text'])); ?></p>
             <?php if (!empty($post['image'])): ?>
@@ -57,10 +87,9 @@ $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </button>
                 <span id="like-count-<?php echo $post['id']; ?>"><?php echo isset($post['like_count']) ? $post['like_count'] : 0; ?></span>
                 <button onclick="toggleComments(<?php echo $post['id']; ?>)" class="px-4 py-2 bg-black text-white font-semibold rounded-md shadow-sm">Comments</button>
-               <span id="view-count-<?php echo $post['id']; ?>">
-    <i class="fas fa-eye"></i> <?php echo isset($post['views']) ? $post['views'] : 0; ?>
-</span>
-
+                <span id="view-count-<?php echo $post['id']; ?>">
+                    <i class="fas fa-eye"></i> <?php echo isset($post['views']) ? $post['views'] : 0; ?>
+                </span>
             </div>
 
             <!-- Comments Section -->
@@ -96,6 +125,7 @@ $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
     <?php endforeach; ?>
 </div>
+
 
 <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 <script>
@@ -170,7 +200,7 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(data => {
             if (data.success) {
                 var viewCountElement = document.getElementById('view-count-' + postId);
-                viewCountElement.textContent = data.viewCount;
+                viewCountElement.innerHTML = `<i class="fas fa-eye"></i> ${data.viewCount}`;
             }
         })
         .catch(error => {
@@ -178,7 +208,8 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
-
 </script>
+<?php
+include('../model/footer.php');
+?>
 
-<?php include('../model/footer.php'); ?>
