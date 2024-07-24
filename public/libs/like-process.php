@@ -11,7 +11,15 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $userId = $_SESSION['user_id'];
-$postId = $_POST['postId'];
+$data = json_decode(file_get_contents("php://input"), true);
+$postId = $data['postId']; // Ensure this is being passed correctly
+
+// Validate postId
+if (!is_numeric($postId)) {
+    $response['message'] = 'Invalid post ID.';
+    echo json_encode($response);
+    exit;
+}
 
 // Check if the user has already liked the post
 $sql = "SELECT id FROM likes WHERE post_id = :post_id AND user_id = :user_id";
@@ -21,7 +29,7 @@ $stmt->bindParam(':user_id', $userId);
 $stmt->execute();
 
 if ($stmt->rowCount() > 0) {
-     header("location: ../user-page.php");
+    $response['message'] = 'You have already liked this post.';
     echo json_encode($response);
     exit;
 }

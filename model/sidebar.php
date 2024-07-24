@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,75 +13,77 @@
 <body class="bg-gray-100 font-sans leading-normal tracking-normal">
 <div id="sidebar" class="fixed inset-y-0 left-0 w-64 bg-gray-800 text-white p-4 sidebar sidebar-hidden">
     <div class="flex justify-center">
-       
     </div>
-             <?php 
-                
-                    $stmt = $conn->prepare("SELECT * FROM `tbl_user`");
-                    $stmt->execute();
-                    $result = $stmt->fetchAll();
-                    foreach ($result as $row) {
-                        $username = $row['username'];
-                        
-                    }
+    <?php
+    if (isset($_SESSION['user_id'])) {
+        $userId = $_SESSION['user_id'];
 
-                    ?>
+        $stmt = $conn->prepare("SELECT * FROM `tbl_user` WHERE tbl_user_id = :userId");
+        $stmt->bindParam(':userId', $userId);
+        $stmt->execute();
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-                    <tr>     
-    <h2 class="text-2xl font-semibold text-center " id="username-<?= $userID ?>"><?php echo $username ?>
-  <span id="sidebar-toggle" class="text-white text-3xl cursor-pointer">&gt;</span>
-    </h2>
+        if ($user) {
+            $username = $user['username'];
+            echo "
+            <h2 class='text-2xl font-semibold text-center' id='username-$userId'>$username
+            <span id='sidebar-toggle' class='text-white text-3xl cursor-pointer'>&gt;</span>
+            </h2>";
+        } else {
+            echo "<p class='text-red-500'>User not found.</p>";
+        }
+    } else {
+        echo "<p class='text-red-500'>You are not logged in.</p>";
+    }
+    ?>
 
-   <ul class="mt-6">
-    <li>
-     <a href="../public/user-page.php" class="block px-4 py-2 mt-2 hover:bg-gray-700 flex items-center">
-        <i class="fas fa-home text-white"></i> Home
-    </a>
-    </li>
-         <li>
-             <a href="../public/user-profile.php" class="block px-4 py-2 mt-2 hover:bg-gray-700">
-            <i class="fas fa-user"></i> Profile
-        </a>
-    </li>
-    <li>
-        <a href="../public/user-post.php" class="block px-4 py-2 mt-2 hover:bg-gray-700">
-            <i class="fas fa-edit"></i> Post
-        </a>
-    </li>
-    <li>
-        <a href="../public/user-message.php" class="block px-4 py-2 mt-2 hover:bg-gray-700">
-            <i class="fas fa-envelope"></i> Messages
-        </a>
-    </li>
-    <li>
-        <a href="../public/user-settings.php" class="block px-4 py-2 mt-2 hover:bg-gray-700">
-            <i class="fas fa-cog"></i> Settings
-        </a>
-    </li>
-    <li>
-        <a href="../public/user-community.php" class="block px-4 py-2 mt-2 hover:bg-gray-700">
-            <i class="fas fa-users"></i> Community
-        </a>
-    </li>
-    <li>
-        <a href="../public/user-logout.php" class="block px-4 py-2 mt-2 hover:bg-gray-700">
-            <i class="fas fa-sign-out-alt"></i> Logout
-        </a>
-    </li>
-</ul>
-</ul>
-
+    <ul class="mt-6">
+        <li>
+            <a href="../public/user-page.php" class="block px-4 py-2 mt-2 hover:bg-gray-700 flex items-center">
+                <i class="fas fa-home text-white"></i> Home
+            </a>
+        </li>
+        <li>
+            <a href="../public/user-profile.php" class="block px-4 py-2 mt-2 hover:bg-gray-700">
+                <i class="fas fa-user"></i> Profile
+            </a>
+        </li>
+        <li>
+            <a href="../public/user-post.php" class="block px-4 py-2 mt-2 hover:bg-gray-700">
+                <i class="fas fa-edit"></i> Post
+            </a>
+        </li>
+        <li>
+            <a href="../public/user-message.php" class="block px-4 py-2 mt-2 hover:bg-gray-700">
+                <i class="fas fa-envelope"></i> Messages
+            </a>
+        </li>
+        <li>
+            <a href="../public/user-settings.php" class="block px-4 py-2 mt-2 hover:bg-gray-700">
+                <i class="fas fa-cog"></i> Settings
+            </a>
+        </li>
+        <li>
+            <a href="../public/user-community.php" class="block px-4 py-2 mt-2 hover:bg-gray-700">
+                <i class="fas fa-users"></i> Community
+            </a>
+        </li>
+        <li>
+            <a href="../public/user-logout.php" class="block px-4 py-2 mt-2 hover:bg-gray-700">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </li>
+    </ul>
 </div>
 <script>
-        document.getElementById('sidebar-toggle').addEventListener('click', function () {
-            var sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('sidebar-hidden');
-            sidebar.classList.toggle('sidebar-visible');
-            var content = document.querySelector('.main-content');
-            content.classList.toggle('ml-64');
-            this.textContent = this.textContent === '>' ? '<' : '>';
-        });
-    </script>
-
+    document.getElementById('sidebar-toggle').addEventListener('click', function () {
+        var sidebar = document.getElementById('sidebar');
+        sidebar.classList.toggle('sidebar-hidden');
+        sidebar.classList.toggle('sidebar-visible');
+        var content = document.querySelector('.main-content');
+        content.classList.toggle('ml-64');
+        this.textContent = this.textContent === '>' ? '<' : '>';
+    });
+</script>
 </body>
 </html>
