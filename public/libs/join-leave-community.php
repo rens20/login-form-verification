@@ -16,22 +16,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = isset($_POST['action']) ? $_POST['action'] : '';
 
     if ($action === 'join') {
-        // Join the community
-        $sql = "INSERT INTO community_memberships (user_id, community_id) VALUES (:userId, :communityId)";
-        $stmt = $conn->prepare($sql);
-        $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
-        $stmt->bindParam(':communityId', $communityId, PDO::PARAM_INT);
-        $stmt->execute();
+        // Fetch the community name
+        $sqlFetchCommunity = "SELECT name FROM communities WHERE id = :communityId";
+        $stmtFetchCommunity = $conn->prepare($sqlFetchCommunity);
+        $stmtFetchCommunity->bindParam(':communityId', $communityId, PDO::PARAM_INT);
+        $stmtFetchCommunity->execute();
+        $community = $stmtFetchCommunity->fetch(PDO::FETCH_ASSOC);
 
-        // Redirect to the communities page with a success message
-        header('Location: ../my-communities.php?message=Joined successfully');
+        if ($community) {
+            $communityName = $community['name'];
+
+            // Join the community
+            $sqlJoin = "INSERT INTO community_memberships (user_id, community_id, community_name) VALUES (:userId, :communityId, :communityName)";
+            $stmtJoin = $conn->prepare($sqlJoin);
+            $stmtJoin->bindParam(':userId', $userId, PDO::PARAM_INT);
+            $stmtJoin->bindParam(':communityId', $communityId, PDO::PARAM_INT);
+            $stmtJoin->bindParam(':communityName', $communityName, PDO::PARAM_STR);
+            $stmtJoin->execute();
+
+            // Redirect to the communities page with a success message
+            header('Location: ../my-communities.php?message=Joined successfully');
+        } else {
+            echo "Community not found.";
+        }
     } elseif ($action === 'leave') {
         // Leave the community
-        $sql = "DELETE FROM community_memberships WHERE user_id = :userId AND community_id = :communityId";
-        $stmt = $conn->prepare($sql);
-        $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
-        $stmt->bindParam(':communityId', $communityId, PDO::PARAM_INT);
-        $stmt->execute();
+        $sqlLeave = "DELETE FROM community_memberships WHERE user_id = :userId AND community_id = :communityId";
+        $stmtLeave = $conn->prepare($sqlLeave);
+        $stmtLeave->bindParam(':userId', $userId, PDO::PARAM_INT);
+        $stmtLeave->bindParam(':communityId', $communityId, PDO::PARAM_INT);
+        $stmtLeave->execute();
 
         // Redirect to the communities page with a success message
         header('Location: ../user-community.php?message=Left successfully');

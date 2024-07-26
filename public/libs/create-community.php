@@ -56,10 +56,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     try {
         $stmt = $conn->prepare("INSERT INTO communities (name, description, created_by, image) VALUES (:name, :description, :created_by, :image)");
-        $stmt->bindValue(':name', $name, PDO::PARAM_STR);
-        $stmt->bindValue(':description', $description, PDO::PARAM_STR);
-        $stmt->bindValue(':created_by', $created_by, PDO::PARAM_INT);
-        $stmt->bindValue(':image', basename($target_file), PDO::PARAM_STR); // Use only the file name
+        $stmt->bindParam(':name', $name, PDO::PARAM_STR);
+        $stmt->bindParam(':description', $description, PDO::PARAM_STR);
+        $stmt->bindParam(':created_by', $created_by, PDO::PARAM_INT);
+        $stmt->bindParam(':image', basename($target_file), PDO::PARAM_STR); // Use only the file name
 
         if ($stmt->execute()) {
             echo "Community created successfully!";

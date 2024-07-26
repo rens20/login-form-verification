@@ -91,7 +91,7 @@ function createCommunity() {
             <form id="create-community-form" enctype="multipart/form-data">
                 <div class="mb-4">
                     <label for="community_image" class="block text-sm font-medium text-gray-700">Community Image</label>
-                    <input type="file" name="community_image" id="community_image" class="mt-1 block w-full">
+                    <input type="file" name="community_image" id="community_image" class="mt-1 block w-full" required>
                 </div>
                 <div class="mb-4">
                     <label for="community_name" class="block text-sm font-medium text-gray-700">Community Name</label>
@@ -107,43 +107,38 @@ function createCommunity() {
         showConfirmButton: false
     });
 
-  document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('create-community-form').addEventListener('submit', function (e) {
-    e.preventDefault();
-    var formData = new FormData(this);
+        e.preventDefault();
+        var formData = new FormData(this);
 
-    fetch('../public/libs/create-community.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.text())
-    .then(data => {
-        if (data.includes('Failed')) {
+        fetch('../../public/libs/create-community.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.text())
+        .then(data => {
+            if (data.includes('Error')) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data
+                });
+            } else {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: 'Community created successfully!'
+                }).then(() => {
+                    window.location.reload();
+                });
+            }
+        })
+        .catch(error => {
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
-                text: data
+                text: 'An error occurred while creating the community.'
             });
-        } else {
-            Swal.fire({
-                icon: 'success',
-                title: 'Success',
-                text: 'Community created successfully!'
-            }).then(() => {
-                window.location.reload();
-            });
-        }
-    })
-    .catch(error => {
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'An error occurred while creating the community.'
         });
     });
-});
-  });
 }
-
-
-//communitys fetch

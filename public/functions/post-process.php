@@ -2,91 +2,94 @@
 session_start();
 include('../../config/conn.php');
 
-// Check if user is logged in
-if (!isset($_SESSION['user_id'])) {
-    echo "You must be logged in to post.";
-    exit;
-}
+// Enable error reporting for debugging
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
-$userId = $_SESSION['user_id'];
+header('Content-Type: application/json');
 
-// Validate that the user ID is valid
-$sql = "SELECT tbl_user_id FROM tbl_user WHERE tbl_user_id = :tbl_user_id";
-$stmt = $conn->prepare($sql);
-$stmt->bindParam(':tbl_user_id', $userId);
-$stmt->execute();
+// Check if the request is a POST request
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Initialize response array
+    $response = ['status' => 'error', 'message' => 'An unexpected error occurred.'];
 
-if ($stmt->rowCount() == 0) {
-    echo "Invalid user.";
-    exit;
-}
-
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $title = $_POST['title'];
-    $text = $_POST['text'];
-
-    // Validate input
-    if (empty($title) || empty($text)) {
-        header('Location: post-error.php?status=empty_fields');
+    // Check if required fields are present
+    if (empty($_POST['title']) || empty($_POST['text']) || !isset($_SESSION['user_id'])) {
+        $response['message'] = 'All fields are required.';
+        echo json_encode($response);
         exit;
     }
 
-    // Validate file upload
-    $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
-    $maxFileSize = 2 * 1024 * 1024; // 2 MB
+    $title = trim($_POST['title']);
+    $text = trim($_POST['text']);
+    $userId = $_SESSION['user_id'];
 
-    $imagePath = '';
-    if (isset($_FILES['image']) && $_FILES['image']['error'] == UPLOAD_ERR_OK) {
-        $imageTmpPath = $_FILES['image']['tmp_name'];
-        $imageName = $_FILES['image']['name'];
-        $imageSize = $_FILES['image']['size'];
-        $imageType = $_FILES['image']['type'];
+    // Handle image upload
+    $imageFile = null;
+    if (!empty($_FILES["image"]["name"])) {
+        $target_dir = "../../uploads/";
+        $target_file = $target_dir . basename($_FILES["image"]["name"]);
+        $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
 
-        // Check file type
-        if (!in_array($imageType, $allowedTypes)) {
-            header("Location: post-error.php?status=invalid_file_type");
+        // Check if image file is a valid image
+        $check = getimagesize($_FILES["image"]["tmp_name"]);
+        if ($check === false) {
+            $response['message'] = 'File is not an image.';
+            echo json_encode($response);
             exit;
         }
 
         // Check file size
-        if ($imageSize > $maxFileSize) {
-            header("Location: post-error.php?status=file_size_exceeded");
+        if ($_FILES["image"]["size"] > 5000000) { // 5MB limit
+            $response['message'] = 'Sorry, your file is too large.';
+            echo json_encode($response);
             exit;
         }
 
-        // Sanitize the file name
-        $imageName = preg_replace("/[^a-zA-Z0-9.]/", "", basename($imageName));
-        $imagePath = '../../uploads/' . $imageName;
-
-        // Ensure the uploads directory exists
-        if (!is_dir('../../uploads/')) {
-            mkdir('../../uploads/', 0777, true);
-        }
-
-        // Move the uploaded file to the 'uploads' directory
-        if (!move_uploaded_file($imageTmpPath, $imagePath)) {
-            header("Location: post-error.php?status=upload_failure");
+        // Allow certain file formats
+        $allowed_formats = ["jpg", "jpeg", "png", "gif"];
+        if (!in_array($imageFileType, $allowed_formats)) {
+            $response['message'] = 'Sorry, only JPG, JPEG, PNG & GIF files are allowed.';
+            echo json_encode($response);
             exit;
         }
+
+        // Check if file already exists
+        if (file_exists($target_file)) {
+            $response['message'] = 'Sorry, file already exists.';
+            echo json_encode($response);
+            exit;
+        }
+
+        // Try to upload file
+        if (!move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
+            $response['message'] = 'Sorry, there was an error uploading your file.';
+            echo json_encode($response);
+            exit;
+        }
+
+        $imageFile = basename($target_file);
     }
 
-    // Insert post into the database using PDO
-    $sql = "INSERT INTO posts (title, text, image, tbl_user_id) VALUES (:title, :text, :image, :tbl_user_id)";
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(':title', $title);
-    $stmt->bindParam(':text', $text);
-    $stmt->bindParam(':image', $imagePath);
-    $stmt->bindParam(':tbl_user_id', $userId);
+    try {
+        $sql = "INSERT INTO posts (title, text, image, created_at, tbl_user_id) VALUES (:title, :text, :image, NOW(), :user_id)";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':title', $title, PDO::PARAM_STR);
+        $stmt->bindParam(':text', $text, PDO::PARAM_STR);
+        $stmt->bindParam(':image', $imageFile, PDO::PARAM_STR); // This can be NULL
+        $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
 
-    if ($stmt->execute()) {
-        // Redirect to success page with status parameter
-        header('Location: post-success.php?status=success');
-        exit;
-    } else {
-        // Redirect to error page with status parameter
-        header('Location: post-error.php?status=db_error');
-        exit;
+        if ($stmt->execute()) {
+            $response['status'] = 'success';
+            $response['message'] = 'Post created successfully!';
+        } else {
+            $errorInfo = $stmt->errorInfo();
+            $response['message'] = 'Database error: ' . $errorInfo[2];
+        }
+    } catch (PDOException $e) {
+        $response['message'] = 'Database error: ' . $e->getMessage();
     }
+
+    echo json_encode($response);
 }
 ?>
-
