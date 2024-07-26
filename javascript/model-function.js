@@ -85,60 +85,65 @@
     }
 //for create community 
 function createCommunity() {
-        Swal.fire({
-            title: 'Edit Profile',
-            html: `
-                <form id="create-comunnity-form" enctype="multipart/form-data">
-                    <div class="mb-4">
-                        <label for="profile_image" class="block text-sm font-medium text-gray-700">Profile Image</label>
-                        <input type="file" name="profile_image" id="profile_image" class="mt-1 block w-full">
-                    </div>
-                    <div class="mb-4">
-                        <label for="first_name" class="block text-sm font-medium text-gray-700">First Name</label>
-                        <input type="text" name="first_name" id="first_name" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                    </div>
-                    <div class="mb-4">
-                        <label for="last_name" class="block text-sm font-medium text-gray-700">Last Name</label>
-                        <input type="text" name="last_name" id="last_name" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                    </div>
-                    <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">Save Changes</button>
-                </form>
-            `,
-            showConfirmButton: false
-        });
+    Swal.fire({
+        title: 'Create Community',
+        html: `
+            <form id="create-community-form" enctype="multipart/form-data">
+                <div class="mb-4">
+                    <label for="community_image" class="block text-sm font-medium text-gray-700">Community Image</label>
+                    <input type="file" name="community_image" id="community_image" class="mt-1 block w-full">
+                </div>
+                <div class="mb-4">
+                    <label for="community_name" class="block text-sm font-medium text-gray-700">Community Name</label>
+                    <input type="text" name="community_name" id="community_name" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                </div>
+                <div class="mb-4">
+                    <label for="community_description" class="block text-sm font-medium text-gray-700">Community Description</label>
+                    <textarea name="community_description" id="community_description" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required></textarea>
+                </div>
+                <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">Create Community</button>
+            </form>
+        `,
+        showConfirmButton: false
+    });
 
-        document.getElementById('create-comunnity-form').addEventListener('submit', function (e) {
-            e.preventDefault();
-            var formData = new FormData(this);
+  document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('create-community-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var formData = new FormData(this);
 
-            fetch('../public/utils/update-profile.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.text())
-            .then(data => {
-                if (data.includes('Failed')) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: data
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success',
-                        text: 'Profile updated successfully!'
-                    }).then(() => {
-                        window.location.reload();
-                    });
-                }
-            })
-            .catch(error => {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'An error occurred while updating the profile.'
-                });
+    fetch('../public/libs/create-community.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.text())
+    .then(data => {
+        if (data.includes('Failed')) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: data
             });
+        } else {
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: 'Community created successfully!'
+            }).then(() => {
+                window.location.reload();
+            });
+        }
+    })
+    .catch(error => {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'An error occurred while creating the community.'
         });
-    }
+    });
+});
+  });
+}
+
+
+//communitys fetch

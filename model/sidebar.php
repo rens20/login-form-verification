@@ -108,20 +108,29 @@
           
             </ul>
         </li>
-       <li class="relative">
-            <a href="../public/user-community.php" onclick="toggleDropdown(event, 'community-dropdown')" class="block px-4 py-2 mt-2 hover:bg-gray-700 flex items-center">    
-            <i class="fas fa-users"></i> Community
-              <i class="fas fa-chevron-down ml-auto"></i>
+   <li class="relative">
+    <a href="#" onclick="toggleDropdown(event, 'community-dropdown')" class="block px-4 py-2 mt-2 hover:bg-gray-700 flex items-center">
+        <i class="fas fa-users"></i> Community
+        <i class="fas fa-chevron-down ml-auto"></i>
+    </a>
+    <ul id="community-dropdown" class="dropdown-menu hidden">
+        <li>
+            <a href="#" onclick="createCommunity()" class="block px-4 py-2 text-white flex items-center">
+                <i class="fas fa-plus mr-2"></i> Create Community
             </a>
-            <ul id="community-dropdown" class="dropdown-menu">
-                <li>
-                    <a href="#" onclick="createCommunity()" class="block px-4 py-2 text-white flex items-center">
-                        <i class="fas fa-plus mr-2"></i> Create Community
-                    </a>
-                </li>
-                <!-- Add more dropdown items here if needed -->
-            </ul></script>
         </li>
+        <li>
+           <a href="../public/my-communities.php" onclick="fetchMyCommunities(); return false;" class="block px-4 py-2 text-white flex items-center">
+                <i class="fas fa-list mr-2"></i> My Communities
+            </a>
+            <ul id="my-communities" class="dropdown-menu hidden">
+                <!-- Community items will be dynamically inserted here -->
+            </ul>
+        </li>
+    </ul>
+</li>
+
+
         <li>
             <a href="../public/user-logout.php" class="block px-4 py-2 mt-2 hover:bg-gray-700">
                 <i class="fas fa-sign-out-alt"></i> Logout

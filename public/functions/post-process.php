@@ -25,6 +25,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $title = $_POST['title'];
     $text = $_POST['text'];
 
+    // Validate input
+    if (empty($title) || empty($text)) {
+        header('Location: post-error.php?status=empty_fields');
+        exit;
+    }
+
     // Validate file upload
     $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
     $maxFileSize = 2 * 1024 * 1024; // 2 MB
@@ -38,28 +44,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         // Check file type
         if (!in_array($imageType, $allowedTypes)) {
-            header("location: ../error/error-404.php");
+            header("Location: post-error.php?status=invalid_file_type");
             exit;
         }
 
         // Check file size
         if ($imageSize > $maxFileSize) {
-            echo "File size exceeds 2 MB.";
+            header("Location: post-error.php?status=file_size_exceeded");
             exit;
         }
-     // Sanitize the file name
+
+        // Sanitize the file name
         $imageName = preg_replace("/[^a-zA-Z0-9.]/", "", basename($imageName));
-        $imagePath = '../../uploads/' . $imageName; // Added trailing slash
+        $imagePath = '../../uploads/' . $imageName;
 
         // Ensure the uploads directory exists
         if (!is_dir('../../uploads/')) {
-            echo "Uploads directory does not exist.";
-            exit;
+            mkdir('../../uploads/', 0777, true);
         }
 
         // Move the uploaded file to the 'uploads' directory
         if (!move_uploaded_file($imageTmpPath, $imagePath)) {
-            echo "Failed to move uploaded file to: " . $imagePath;
+            header("Location: post-error.php?status=upload_failure");
             exit;
         }
     }
@@ -78,8 +84,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit;
     } else {
         // Redirect to error page with status parameter
-        header('Location: post-success.php?status=error');
+        header('Location: post-error.php?status=db_error');
         exit;
     }
 }
 ?>
+
