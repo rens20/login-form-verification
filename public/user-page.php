@@ -29,6 +29,25 @@ $sql = "
 $stmt = $conn->prepare($sql);
 $stmt->execute();
 $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+//community name fehcing post by user
+$sqlFetch = "SELECT c.name 
+             FROM community_memberships cm
+             JOIN communities c ON cm.community_id = c.id
+             WHERE cm.user_id = :userId";
+
+// Prepare the statement
+$stmtFetch = $conn->prepare($sqlFetch);
+
+// Bind the user ID parameter
+$stmtFetch->bindParam(':userId', $userId, PDO::PARAM_INT);
+
+// Execute the statement
+$stmtFetch->execute();
+
+// Fetch the results as an associative array
+$communityNames = $stmtFetch->fetchAll(PDO::FETCH_COLUMN, 0);
+
 ?>
 <style>
     .like-btn {
@@ -62,8 +81,13 @@ $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <div class="container mx-auto p-6 bg-white shadow-md rounded-lg max-w-3xl">
     <h1 class="text-2xl font-bold mb-4 text-center">Posts</h1>
-
+  
     <?php foreach ($posts as $post): ?>
+          <ul>
+        <?php foreach ($communityNames as $communityName): ?>
+            <li><?php echo htmlspecialchars($communityName); ?></li>
+        <?php endforeach; ?>
+    </ul>
         <div class="mb-6 p-4 border border-gray-300 rounded-md shadow-sm post" data-post-id="<?php echo $post['id']; ?>">
             <div class="user-info">
                 <?php

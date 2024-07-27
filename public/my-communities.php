@@ -39,6 +39,8 @@ $stmtNotJoined = $conn->prepare($sqlNotJoined);
 $stmtNotJoined->bindParam(':userId', $userId, PDO::PARAM_INT);
 $stmtNotJoined->execute();
 $notJoinedCommunities = $stmtNotJoined->fetchAll(PDO::FETCH_ASSOC);
+
+
 ?>
 <div class="container mx-auto p-6 bg-white shadow-md rounded-lg max-w-3xl mx-auto mt-10">
     <h1 class="text-2xl font-bold mb-4 text-center">My Communities</h1>
@@ -48,6 +50,7 @@ $notJoinedCommunities = $stmtNotJoined->fetchAll(PDO::FETCH_ASSOC);
         <?php if (!empty($createdCommunities)): ?>
             <?php foreach ($createdCommunities as $community): ?>
                 <li class="mb-2">
+           
                     <div class="p-4 bg-gray-100 rounded">
                         <h3 class="text-lg font-bold"><?= htmlspecialchars($community['name']) ?></h3>
                         <p><?= htmlspecialchars($community['description']) ?></p>
